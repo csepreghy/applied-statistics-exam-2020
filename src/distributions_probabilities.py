@@ -70,6 +70,7 @@ def exercise_2():
 	fig, ax = plotify.get_figax()
 	for x, y in enumerate(yvals):
 		plt.axvline(x=x, ymin=0, ymax=y, alpha=0.8, label='P of the score being exactly even', color=plotify.c_orange)
+	
 	# ax.scatter(xvals, yvals, color=plotify.c_orange, s=2)
 	ax.set_yticks(major_yticks)
 	ax.set_ylabel("P of hitting the window")
