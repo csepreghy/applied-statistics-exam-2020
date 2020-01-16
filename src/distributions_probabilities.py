@@ -58,22 +58,24 @@ def exercise_2():
 	p = 0.054
 
 	yvals = []
-	xvals = np.linspace(0, 100, 100)
+	xvals = np.linspace(0, 80, 80)
 	major_yticks = np.linspace(0, 1, 11)
 
-	for n in range(100):
+	for n in range(80):
 		result = 1 - ((1 - p)**n)
 		print(n, ": ", result)
 		yvals.append(result)
 
 
 	fig, ax = plotify.get_figax()
-	ax.plot(xvals, yvals, color=plotify.c_orange)
+	for x, y in enumerate(yvals):
+		plt.axvline(x=x, ymin=0, ymax=y, alpha=0.8, label='P of the score being exactly even', color=plotify.c_orange)
+	# ax.scatter(xvals, yvals, color=plotify.c_orange, s=2)
 	ax.set_yticks(major_yticks)
 	ax.set_ylabel("P of hitting the window")
 	ax.set_xlabel("Number of tries")
 	ax.set_title("Probability of hitting the window")
-
+	plt.savefig(('plots/' + 'window_hitting'), facecolor=plotify.background_color, dpi=180)
 	plt.show()
 
 if __name__ == "__main__":
