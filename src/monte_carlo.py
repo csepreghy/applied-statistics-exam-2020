@@ -107,8 +107,10 @@ def fit_c_values(n_points, n_bins):
 	ax.set_ylabel("Number Of Sampled Values")
 	ax.set_title("Sampling Values According f(x)")
 	ax.legend(facecolor="#282D33", loc="upper left")
+	plt.savefig(('plots/' + 'monte_carlo'), facecolor=plotify.background_color, dpi=180)
 
-	# plt.show()
+
+	plt.show()
 	
 	pearson_correlation, _ = pearsonr(xvals, yvals)
 	print('Pearsons correlation: %.3f' % pearson_correlation)
@@ -139,14 +141,15 @@ def fit_c_values(n_points, n_bins):
 
 	fig, ax2 = plotify.get_figax()
 
-	ax2.plot(xvals, yvals, c=plotify.c_blue, label="Probability Distribution")
+	ax2.plot(xvals, yvals, c=plotify.c_blue, label="Fitted Probability Distribution")
 	ax2.hist(accepted_x_vals, bins=n_bins, range=(xmin, xmax), histtype='step', label="Number of Sampled Values", color=plotify.c_orange, linewidth=2)
 	ax2.set_xlabel("Randomly Sampled Value")
 	ax2.set_ylabel("Number Of Sampled Values")
 	ax2.set_title("Sampling Values According f(x) fitted")
 	ax2.legend(facecolor="#282D33", loc="upper left")
+	plt.savefig(('plots/' + 'monte_carlo_fitted'), facecolor=plotify.background_color, dpi=180)
 
-	# plt.show()
+	plt.show()
 
 	c1_fraction = 1 - (1 / c1)
 	c2_fraction = 1 - (2 / c2)
@@ -154,8 +157,8 @@ def fit_c_values(n_points, n_bins):
 	return c1_fraction, c2_fraction
 
 if __name__ == "__main__":
-	n_points_list = [1000000]
-	n_bins = 200
+	n_points_list = [50000]
+	n_bins = 75
 	for n_points in n_points_list:
 		c1_fraction, c2_fraction = fit_c_values(n_points, n_bins)
 		print(f'c1_fraction = {c1_fraction}')

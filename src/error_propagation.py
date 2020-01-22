@@ -21,26 +21,26 @@ r = np.random
 def func_gaussian_pdf(x, mu, sigma):
     return norm.pdf(x, mu, sigma)
 
-def chi2_gauss(params, observed_vals, xvals):
-	C, mu, sigma = params
+# def chi2_gauss(params, observed_vals, xvals):
+# 	C, mu, sigma = params
 
-	if mu < 0: return 999999
-	if sigma < 0: return 999999
-	# if C < 0: return 999999
+# 	if mu < 0: return 999999
+# 	if sigma < 0: return 999999
+# 	# if C < 0: return 999999
 
-	expected_gauss_vals = np.zeros(len(observed_vals))
+# 	expected_gauss_vals = np.zeros(len(observed_vals))
 
-	print(f'params = {params}')
+# 	print(f'params = {params}')
 	
-	for i, x in enumerate(xvals):
-		expected_gauss_vals[i] = C * func_gaussian_pdf(x, mu, sigma)
+# 	for i, x in enumerate(xvals):
+# 		expected_gauss_vals[i] = C * func_gaussian_pdf(x, mu, sigma)
 
-	print(f'observed_vals = {observed_vals[0:10]}')
-	print(f'expexted_gauss_vals = {expected_gauss_vals[0:10]}')
-	chi2, chi2_pval = chisquare(observed_vals, expected_gauss_vals)
-	print(f'chi2 = {chi2}')
+# 	print(f'observed_vals = {observed_vals[0:10]}')
+# 	print(f'expexted_gauss_vals = {expected_gauss_vals[0:10]}')
+# 	chi2, chi2_pval = chisquare(observed_vals, expected_gauss_vals)
+# 	print(f'chi2 = {chi2}')
 
-	return chi2
+# 	return chi2
 
 def get_weighted_mean(values, unvertainties):
 	numerator = 0
@@ -110,8 +110,6 @@ def exercise_1():
 	print(f'chi2_value_3 = {chi2_value_3}')
 	print(f'p_chi2_3 = {p_chi2_3}')
 
-
-
 	mean = np.mean(hubble_values)
 	xvals = np.array([1, 2, 3, 4, 5, 6, 7])
 	fig, ax = plotify.get_figax(figsize=(8,6), use_grid=True)
@@ -170,6 +168,31 @@ def exercise_2():
 def rmse(predictions, targets):
     return np.sqrt(((predictions - targets) ** 2).mean())
 
+def chi2_gauss(params, observed_vals, xvals):
+	C, mu, sigma = params
+
+	if mu < 0: return 999999
+	if sigma < 0: return 999999
+	# if C < 0: return 999999
+
+	expected_gauss_vals = np.zeros(len(observed_vals))
+
+	print(f'params = {params}')
+	
+	for i, x in enumerate(xvals):
+		expected_gauss_vals[i] = C * func_gaussian_pdf(x, mu, sigma)
+
+	print(f'observed_vals = {observed_vals[0:10]}')
+	print(f'expexted_gauss_vals = {expected_gauss_vals[0:10]}')
+	chi2, chi2_pval = chisquare(observed_vals, expected_gauss_vals)
+	print(f'chi2 = {chi2}')
+	ndof = len(xvals) - 2
+	p_chi2 = stats.chi2.sf(chi2, ndof)
+	print(f'p_chi2 = {p_chi2}')
+	print(f'chi2_pval = {chi2_pval}')
+
+	return chi2
+
 def exercise_3():
 	fDNA = np.loadtxt('data/data_DNAfraction.txt')
 	print(f'len(fDNA) = {len(fDNA)}')
@@ -205,6 +228,8 @@ def exercise_3():
 	fDNA_main_mean = np.mean(fDNA_main)
 	fDNA_main_std = np.std(fDNA_main)
 
+	##############
+
 	expected_gaussian_vals = np.zeros(n_bins)
 	y_observed, xExp_edges = np.histogram(fDNA_main, bins=n_bins, range=(xmin, xmax))
 	xvals = np.linspace(xmin, xmax, n_bins)
@@ -216,23 +241,55 @@ def exercise_3():
 
 	expected_gauss_vals = np.zeros(len(y_observed))
 	for i, x in enumerate(xvals):
-		expected_gauss_vals[i] = res_gauss.x[0] * func_gaussian_pdf(x, res_gauss.x[1], res_gauss.x[2] - 0.4)
-	
+		expected_gauss_vals[i] = res_gauss.x[0] * func_gaussian_pdf(x, res_gauss.x[1], res_gauss.x[2])
+
 	chi2_value_gaussian, chi2_pval_gaussian = chisquare(y_observed, expected_gaussian_vals)
 	print(f'chi2_value_gaussian = {chi2_value_gaussian}')
 	print(f'chi2_pval_gaussian = {chi2_pval_gaussian} \n\n')
 
-	print(f'yExp = {y_observed}')
 	yvals_gaussian = res_gauss.x[0] * func_gaussian_pdf(xvals, res_gauss.x[1], res_gauss.x[2])
 
-	fig, ax2 = plotify.get_figax()
-	ax2.scatter(xvals, y_observed, s=3)
-	# ax2.hist(fDNA_main, bins=n_bins, range=(xmin, xmax), histtype='step', linewidth=2, color=plotify.c_orange)
-	ax2.plot(xvals, yvals_gaussian, color=plotify.c_blue)
-	ax2.set_xlabel("Fraction of Neanderthal DNA (Main Population)")
-	ax2.set_ylabel("Number of people in per bin")
-	ax2.set_title("Histogram of people with different fractions of Neanderthal DNA")
+	fig2, ax2 = plotify.get_figax()
+
+	ax2.hist(fDNA_main, bins=n_bins, range=(xmin, xmax), histtype='step', label="Number of People", color=plotify.c_orange, linewidth=2)
+	ax2.plot(xvals, yvals_gaussian, label="Fitted Gaussian", color=plotify.c_blue)
+	ax2.set_title("Fitted Gaussian on the DNA fractions")
+	ax2.set_xlabel("Neanderthal DNA fraction")
+	ax2.set_ylabel("Number of people / bin")
+	plt.legend(facecolor="#282D33")
+	plt.savefig(('plots/' + 'dna_gaussian'), facecolor=plotify.background_color, dpi=180)
 	plt.show()
+
+	#################
+
+	# expected_gaussian_vals = np.zeros(n_bins)
+	# y_observed, xExp_edges = np.histogram(fDNA_main, bins=n_bins, range=(xmin, xmax))
+	# xvals = np.linspace(xmin, xmax, n_bins)
+
+	# x0 = [0.6, fDNA_main_mean, fDNA_main_std]
+	# res_gauss = minimize(chi2_gauss, x0, args=(y_observed, xvals))
+	# print(f'res_gauss gauss x = {res_gauss.x}')
+	# print(f'res_gauss = {res_gauss}')
+
+	# expected_gauss_vals = np.zeros(len(y_observed))
+	# for i, x in enumerate(xvals):
+	# 	expected_gauss_vals[i] = res_gauss.x[0] * func_gaussian_pdf(x, res_gauss.x[1], res_gauss.x[2])
+	
+	# chi2_value_gaussian, chi2_pval_gaussian = chisquare(y_observed, expected_gaussian_vals)
+	# print(f'chi2_value_gaussian = {chi2_value_gaussian}')
+	# print(f'chi2_pval_gaussian = {chi2_pval_gaussian} \n\n')
+
+	# print(f'yExp = {y_observed}')
+	# yvals_gaussian = res_gauss.x[0] * func_gaussian_pdf(xvals, res_gauss.x[1], res_gauss.x[2])
+
+	# fig, ax2 = plotify.get_figax()
+	# ax2.scatter(xvals, y_observed, s=3)
+	# # ax2.hist(fDNA_main, bins=n_bins, range=(xmin, xmax), histtype='step', linewidth=2, color=plotify.c_orange)
+	# ax2.plot(xvals, yvals_gaussian, color=plotify.c_blue)
+	# ax2.set_xlabel("Fraction of Neanderthal DNA (Main Population)")
+	# ax2.set_ylabel("Number of people in per bin")
+	# ax2.set_title("Histogram of people with different fractions of Neanderthal DNA")
+	# plt.show()
 
 # params = [0.30825654 0.08781376]
 
